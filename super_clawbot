@@ -70,28 +70,24 @@ void pre_auton()
 
 task autonomous()
 {
-	if(vexRT[Btn8U] == 1)
-	{
-  // ..........................................................................
-  // Insert user code here.
-  // ..........................................................................
-	clearTimer(T1); // resets Timer (T1) to zero
-	int startTime;
-	int endTime;
-	
-	startTime = nSysTime;
-	endTime = nSysTime;
-	while(endTime - startTime < 30)
-		{
-				motor[leftMotor] = 400;
-    		motor[rightMotor] = 400;
-				endTime = nSysTime;	
-		}//end of while loop
-	
-	}//end of if statement
-  // Remove this function call once you have "real" code.
-  //AutonomousCodePlaceholderForTesting();
-}
+	 while (true)
+  {
+				int startTime; //variable to hold the starting time
+				int currentTime; //variable to hold the current time
+				startTime = nSysTime; //takes the current system time and sets it to a variable
+				currentTime = nSysTime; // initializes the currentTime variable to the current system time
+				float runningTime = currentTime - startTime; // computes the running time by subtracting the current running time from the starting time
+				while(runningTime < 10000) // while the running time is less than 10000 ms (10 secs) keep running
+					{
+							// moves straight forward for the allotted time
+							motor[leftMotor] = 80; // left motor runs
+			    		motor[rightMotor] = 80; // right motor runs
+							currentTime = nSysTime; //keep updating the current time 
+							runningTime = currentTime - startTime; //keep updating the running time
+					}//end of inner while loop
+			break;		//breaks out of the while loop and ends the autonomous mode
+	} //end of outer while loop		
+} //end of autonomous mode
 
 /*---------------------------------------------------------------------------*/
 /*                                                                           */
@@ -110,23 +106,11 @@ task usercontrol()
 
   while (true)
   {
-  	// if you push button 8U (top button on right directional pad)this will happen autonomously
+  	// if you push button 8U (top button on right directional pad)autonomous mode is activated
+  	// see task autonomous to see what happens in autonomous mode
   	if(vexRT[Btn8U] == 1)
 			{
-				int startTime; //variable to hold the starting time
-				int currentTime; //variable to hold the current time
-				startTime = nSysTime; //takes the current system time and sets it to a variable
-				currentTime = nSysTime; // initializes the currentTime variable to the current system time
-				float runningTime = currentTime - startTime; // computes the running time by subtracting the current running time from the starting time
-				while(runningTime < 10000) // while the running time is less than 10000 ms (10 secs) keep running
-					{
-							// moves straight forward for the allotted time
-							motor[leftMotor] = 80; // left motor runs
-			    		motor[rightMotor] = 80; // right motor runs
-							currentTime = nSysTime; //keep updating the current time 
-							runningTime = currentTime - startTime; //keep updating the running time
-					}//end of while loop
-				
+				startTask(autonomous);
 			}//end of if statement
 			
     // This is the main execution loop for the user control program.
