@@ -82,11 +82,15 @@ task autonomous()
 							// moves straight forward for the allotted time
 							motor[leftMotor] = 80; // left motor runs
 			    		motor[rightMotor] = 80; // right motor runs
-							currentTime = nSysTime; //keep updating the current time 
+							currentTime = nSysTime; //keep updating the current time
 							runningTime = currentTime - startTime; //keep updating the running time
+							if(vexRT[Btn8U] == 1)//hit button 8U to end autonomous mode
+							{
+								runningTime = 30000;
+							}
 					}//end of inner while loop
 			break;		//breaks out of the while loop and ends the autonomous mode
-	} //end of outer while loop		
+	} //end of outer while loop
 } //end of autonomous mode
 
 /*---------------------------------------------------------------------------*/
@@ -101,7 +105,7 @@ task autonomous()
 
 task usercontrol()
 {
-	
+
   // User control code here, inside the loop
 
   while (true)
@@ -112,7 +116,7 @@ task usercontrol()
 			{
 				startTask(autonomous);
 			}//end of if statement
-			
+
     // This is the main execution loop for the user control program.
     // Each time through the loop your program should update motor + servo
     // values based on feedback from the joysticks.
@@ -126,56 +130,59 @@ task usercontrol()
     motor[rightMotor] = vexRT[Ch3] / 2;
 	//vexRT[Ch1] / 2; will use the x axis of the right joystick for whatever you want
 	//vexRT[Ch4] / 2; will use the x axis of the left joystick for whatever you want
-	
-		
-    //to move the shoulder
-    if(vexRT[Btn6U] == 1) //moves shoulder up when you press button 6U (right upper trigger)
-    {
-      motor[shoulder] = -40;
-    }
-    else if(vexRT[Btn6D] == 1) //moves shoulder down when you press button 6D (right lower trigger)
+
+    //to move the shoulder and elbow using controller 2
+	 	motor[shoulder] = -vexRT[Ch2Xmtr2] / 2; //will move the shoulder up and down. up on the right joystick moves the shoulder up down moves it down
+	 	motor[elbow] = vexRT[Ch3Xmtr2] / 2; //will move the elbow up and down. up on the left joystick moves the elbow up down moves it down
+    
+	 	//to move the shoulder using controller 1
+    if(vexRT[Btn5U] == 1) //moves shoulder down when you press button 5U (left upper trigger)
     {
       motor[shoulder] = 40;
+    }
+    else if(vexRT[Btn6U] == 1) //moves shoulder up when you press button 6U (right upper trigger)
+    {
+      motor[shoulder] = -40;
     }
     else //stops the shoulder from moving when no buttons are pushed
     {
       motor[shoulder] = 0;
     } //end of shoulder
-    
+
     //to move the elbow
-     if(vexRT[Btn5U] == 1) //moves the elbow up when you press button 5U (left upper trigger)
-    {
-      motor[elbow] = -40;
-    }
-    else if(vexRT[Btn5D] == 1) //moves the elbow down when you press button 5D (left lower trigger)
+     if(vexRT[Btn5D] == 1) //moves the elbow down when you press button 5D (left lower trigger)
     {
       motor[elbow] = 40;
+    }
+    else if(vexRT[Btn6D] == 1) //moves the elbow up when you press button 6D (right lower trigger)
+    {
+      motor[elbow] = -40;
     }
     else //stops the elbow from moving when no buttons are pushed
     {
       motor[elbow] = 0;
     }// end of elbow
-    
+
     // to move the wrist
-     if(vexRT[Btn7L] == 1)//rotates the claw counterclockise when button 7L is pushed (left button on left directional pad)
-    {
-      motor[wrist] = -40;
-    }
-    else if(vexRT[Btn7D] == 1) //rotates the claw clockise when button 7D is pushed (bottom button on left directional pad)
+     if(vexRT[Btn5DXmtr2] == 1)//rotates the claw counterclockise when button 5D is pushed (left lower trigger)
     {
       motor[wrist] = 40;
+    }
+    else if(vexRT[Btn6DXmtr2] == 1) //rotates the claw clockise when button 6D is pushed (right lower trigger)
+    {
+      motor[wrist] = -40;
     }
     else //no rotation when no buttons are pushed
     {
       motor[wrist] = 0;
     }
-    
-    // to move the claw
-     if(vexRT[Btn8R] == 1) //opens the claw when button 8R is pushed (right button on right directional pad)
+
+    // to move the claw - claw is controlled by controller 2
+     if(vexRT[Btn6UXmtr2] == 1) //opens the claw when button 6U is pushed (right upper trigger)
     {
       motor[claw] = 40;
     }
-    else if(vexRT[Btn8D] == 1) //closes the claw when button 8D is pushed (bottom button on right directional pad)
+    else if(vexRT[Btn5UXmtr2] == 1) //closes the claw when button 5U is pushed (left upper trigger)
     {
       motor[claw] = -40;
     }
@@ -183,6 +190,20 @@ task usercontrol()
     {
       motor[claw] = 0;
   	}
+  /*	// to move the claw - claw is controlled by controller 1
+     if(vexRT[Btn8D] == 1) //opens the claw when button 6U is pushed (right upper trigger)
+    {
+      motor[claw] = 40;
+    }
+    else if(vexRT[Btn7D] == 1) //closes the claw when button 5U is pushed (left upper trigger)
+    {
+      motor[claw] = -40;
+    }
+    else //stops the claw when no buttons are pushed
+    {
+      motor[claw] = 0;
+  	}
+  	*/
 	}//end of while loop
-    
+
 }//end of task
