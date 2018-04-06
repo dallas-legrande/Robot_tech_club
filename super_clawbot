@@ -1,12 +1,12 @@
 #pragma config(Sensor, in1,    ,               sensorLineFollower)
 #pragma config(Sensor, in2,    ,               sensorLineFollower)
 #pragma config(Sensor, in3,    ,               sensorLineFollower)
-#pragma config(Sensor, dgtl1,  ,               sensorSONAR_cm)
-#pragma config(Sensor, dgtl3,  ,               sensorTouch)
-#pragma config(Sensor, dgtl4,  ,               sensorTouch)
-#pragma config(Sensor, dgtl5,  ,               sensorTouch)
+#pragma config(Sensor, dgtl1,  sonar,          sensorSONAR_inch)
+#pragma config(Sensor, dgtl3,  elbowStop,      sensorTouch)
+#pragma config(Sensor, dgtl4,  shoulderStop,   sensorTouch)
+#pragma config(Sensor, dgtl5,  back,           sensorTouch)
 #pragma config(Sensor, dgtl6,  ,               sensorQuadEncoder)
-#pragma config(Sensor, dgtl8,  ,               sensorQuadEncoder)
+#pragma config(Sensor, dgtl8,  sGauge,         sensorQuadEncoder)
 #pragma config(Motor,  port1,           leftMotor,     tmotorVex393_HBridge, openLoop, reversed, driveLeft)
 #pragma config(Motor,  port2,           claw,          tmotorServoContinuousRotation, openLoop)
 #pragma config(Motor,  port3,           wrist,         tmotorServoContinuousRotation, openLoop)
@@ -72,21 +72,60 @@ task autonomous()
 {
 	 while (true)
   {
-				int startTime; //variable to hold the starting time
+				/*int startTime; //variable to hold the starting time
 				int currentTime; //variable to hold the current time
 				startTime = nSysTime; //takes the current system time and sets it to a variable
 				currentTime = nSysTime; // initializes the currentTime variable to the current system time
-				float runningTime = currentTime - startTime; // computes the running time by subtracting the current running time from the starting time
-				while(runningTime < 10000) // while the running time is less than 10000 ms (10 secs) keep running
+				float runningTime = currentTime - startTime; // computes the running time by subtracting the current running time from the starting time*/
+			/*	while(runningTime < 10000) // while the running time is less than 10000 ms (10 secs) keep running
 					{
 							// moves straight forward for the allotted time
+							//time1[10000]
 							motor[leftMotor] = 80; // left motor runs
 			    		motor[rightMotor] = 80; // right motor runs
-							currentTime = nSysTime; //keep updating the current time 
+							currentTime = nSysTime; //keep updating the current time
 							runningTime = currentTime - startTime; //keep updating the running time
+							if(vexRT[Btn8U] == 1)//hit button 8U to end autonomous mode
+							{
+								runningTime = 30000;
+							}
+							//wait1Msec(2000); //pause for 2 seconds
+							*/
+							
+					//Times trials
+							//travels 61.5 inches in 10 seconds in run 1
+							//travels 61 inches in 10 seconds in run 2
+							//travels 61 inches in 10 seconds in run 3
+							//travels 60.5 inches in 10 seconds in run 4
+							//travels 61 inches in 10 seconds in run 2
+							
+							//avg 61 inches in 10 seconds
+							//6.1 inches per second
+							
+							//(number of inches to travel) / 6.1 inches per second = number of seconds to run to reach that distance in inches
+							
+							
+				clearTimer(T1); //clears the timer
+				while(time1[T1] < 5393) //lets the timer run fro 5.393 seconds
+				{
+					motor[leftMotor] = 80; // left motor runs
+			    motor[rightMotor] = 80; // right motor runs
 					}//end of inner while loop
+				
+				/*clearTimer(T1);
+				while(time1[T1] < 4000)
+				{
+					motor[shoulder] = -160;
+				}//end of inner while loop
+				*/
+				while(SensorValue[sGauge] != 50) //move the shoulder until it is at the top. Takes the sensor value it starts with which is around 160 and stops when it 
+					//has turned enough revolutions to be at a value of 50
+				{
+							motor[shoulder] = -600;
+		 		}
+					
 			break;		//breaks out of the while loop and ends the autonomous mode
-	} //end of outer while loop		
+	} //end of outer while loop
 } //end of autonomous mode
 
 /*---------------------------------------------------------------------------*/
@@ -101,18 +140,25 @@ task autonomous()
 
 task usercontrol()
 {
-	
+
   // User control code here, inside the loop
 
   while (true)
   {
+
+  		/*while(SensorValue[sonar] < 0) //|| SensorValue[sonar] < 0)
+					{
+						 motor[wrist] = 5;
+						 motor[wrist] = 5;
+					} */
+
   	// if you push button 8U (top button on right directional pad)autonomous mode is activated
   	// see task autonomous to see what happens in autonomous mode
   	if(vexRT[Btn8U] == 1)
 			{
 				startTask(autonomous);
 			}//end of if statement
-			
+
     // This is the main execution loop for the user control program.
     // Each time through the loop your program should update motor + servo
     // values based on feedback from the joysticks.
@@ -121,61 +167,107 @@ task usercontrol()
     // Insert user code here. This is where you use the joystick values to
     // update your motors, etc.
     // ........................................................................
+
 //Driving Motor Control with Remote Control 1
     motor[leftMotor] = vexRT[Ch2] / 2;
     motor[rightMotor] = vexRT[Ch3] / 2;
 	//vexRT[Ch1] / 2; will use the x axis of the right joystick for whatever you want
 	//vexRT[Ch4] / 2; will use the x axis of the left joystick for whatever you want
-	
-		
-    //to move the shoulder
-    if(vexRT[Btn6U] == 1) //moves shoulder up when you press button 6U (right upper trigger)
-    {
-      motor[shoulder] = -40;
-    }
-    else if(vexRT[Btn6D] == 1) //moves shoulder down when you press button 6D (right lower trigger)
-    {
-      motor[shoulder] = 40;
-    }
-    else //stops the shoulder from moving when no buttons are pushed
-    {
-      motor[shoulder] = 0;
-    } //end of shoulder
-    
-    //to move the elbow
-     if(vexRT[Btn5U] == 1) //moves the elbow up when you press button 5U (left upper trigger)
-    {
-      motor[elbow] = -40;
-    }
-    else if(vexRT[Btn5D] == 1) //moves the elbow down when you press button 5D (left lower trigger)
-    {
-      motor[elbow] = 40;
-    }
-    else //stops the elbow from moving when no buttons are pushed
-    {
-      motor[elbow] = 0;
-    }// end of elbow
-    
-    // to move the wrist
-     if(vexRT[Btn7L] == 1)//rotates the claw counterclockise when button 7L is pushed (left button on left directional pad)
-    {
-      motor[wrist] = -40;
-    }
-    else if(vexRT[Btn7D] == 1) //rotates the claw clockise when button 7D is pushed (bottom button on left directional pad)
+
+    //to move the shoulder and elbow using controller 2
+
+//	 	motor[shoulder] = -vexRT[Ch2Xmtr2] / 2; //will move the shoulder up and down. up on the right joystick moves the shoulder up, down moves it down
+//	 	motor[elbow] = vexRT[Ch3Xmtr2] / 2; //will move the elbow up and down. up on the left joystick moves the elbow up, down moves it down
+
+	 	//to move the SHOULDER using controller 1
+	 //	if(SensorValue[shoulderStop] != 1) //if the shoulder is not all the way down then allow full motor control
+	 	//{
+	    if(vexRT[Btn5U] == 1) //moves shoulder down when you press button 5U (left upper trigger)
+	    {
+	      motor[shoulder] = 40;
+	    }//end of inner if
+	    else if(vexRT[Btn6U] == 1) //moves shoulder up when you press button 6U (right upper trigger)
+	    {
+	      motor[shoulder] = -40;
+	    }//end of else
+	    else //stops the shoulder from moving when no buttons are pushed
+	    {
+	      motor[shoulder] = 0;
+	    } //end of else
+	  /*}//end of outer if
+	  else //the shoulder is all the way down so stop the motor and keep it from being able to continue going down
+	  {
+	    if(vexRT[Btn6U] == 1) //moves shoulder up when you press button 6U (right upper trigger)
+	    {
+	      motor[shoulder] = -40;
+	    }//end of else
+	    else //stops the shoulder from moving when no buttons are pushed
+	    {
+	      motor[shoulder] = 0;
+	    } //end of inner else
+		}//end of else and end of shoulder
+*/
+    //to move the ELBOW
+    if(SensorValue[elbowStop] != 1) //if the elbow is not all the way in then allow full motor control
+  	{
+	     if(vexRT[Btn5D] == 1) //moves the elbow down when you press button 5D (left lower trigger)
+	    {
+	      motor[elbow] = 40;
+	    }
+	    else if(vexRT[Btn6D] == 1) //moves the elbow up when you press button 6D (right lower trigger)
+	    {
+	      motor[elbow] = -40;
+	    }
+	    else //stops the elbow from moving when no buttons are pushed
+	    {
+	      motor[elbow] = 0;
+	    }// end of else
+		}//end of if
+		else //the shoulder is all the way in so stop the motor and keep it from being able to continue going in
+  	{
+	     if(vexRT[Btn5D] == 1) //moves the elbow down when you press button 5D (left lower trigger)
+	    {
+	      motor[elbow] = 40;
+	    }
+	    else //stops the elbow from moving when no buttons are pushed
+	    {
+	      motor[elbow] = 0;
+	    }// end of inner else
+		}//end of else and end of elbow
+
+/*    // to move the WRIST
+     if(vexRT[Btn5DXmtr2] == 1)//rotates the claw counterclockise when button 5D is pushed (left lower trigger)
     {
       motor[wrist] = 40;
+    }
+    else if(vexRT[Btn6DXmtr2] == 1) //rotates the claw clockise when button 6D is pushed (right lower trigger)
+    {
+      motor[wrist] = -40;
     }
     else //no rotation when no buttons are pushed
     {
       motor[wrist] = 0;
     }
-    
-    // to move the claw
-     if(vexRT[Btn8R] == 1) //opens the claw when button 8R is pushed (right button on right directional pad)
+
+    // to move the claw - claw is controlled by controller 2
+     if(vexRT[Btn6UXmtr2] == 1) //opens the claw when button 6U is pushed (right upper trigger)
     {
       motor[claw] = 40;
     }
-    else if(vexRT[Btn8D] == 1) //closes the claw when button 8D is pushed (bottom button on right directional pad)
+    else if(vexRT[Btn5UXmtr2] == 1) //closes the claw when button 5U is pushed (left upper trigger)
+    {
+      motor[claw] = -40;
+    }
+    else //stops the claw when no buttons are pushed
+    {
+      motor[claw] = 0;
+  	} */
+  	// to move the claw - claw is controlled by controller 1
+     if(vexRT[Btn8D] == 1) //opens the claw when button 6U is pushed (right upper trigger)
+    {
+      motor[claw] = 40;
+    }
+    else if(vexRT[Btn7D] == 1) //closes the claw when button 5U is pushed (left upper trigger)
     {
       motor[claw] = -40;
     }
@@ -183,6 +275,7 @@ task usercontrol()
     {
       motor[claw] = 0;
   	}
+
 	}//end of while loop
-    
+
 }//end of task
